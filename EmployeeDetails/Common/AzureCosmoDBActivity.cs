@@ -2,8 +2,10 @@
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace EmployeeDetails.Common
@@ -24,6 +26,7 @@ namespace EmployeeDetails.Common
 
         private string containerId = "EmployeeDetails";
         internal Task<Employee> objEmployeeDetails;
+        private static string emailString;
 
         public List<Employee> EmployeeId { get; private set; }
         public ItemResponse<Employee> EmployeeResponse { get; private set; }
@@ -72,18 +75,29 @@ namespace EmployeeDetails.Common
             }
             return EmployeeResponse;
         }
-        public async Task<ItemResponse<Employee>> GetEmployeeItem(string EmployeeId, string partionKey)
+        public async Task<ItemResponse<Employee>> GetEmployeeItem(string EmployeeId, string partitionKey)
         {
             ItemResponse<Employee> EmployeeResponse = null;
             try
             {
-                EmployeeResponse = await this.container.ReadItemAsync<Employee>(EmployeeId, new PartitionKey(partionKey));
+                EmployeeResponse = await this.container.ReadItemAsync<Employee>(EmployeeId, new PartitionKey(partitionKey));
             }
             catch (CosmosException ex)
             {
                 throw ex;
             }
             return EmployeeResponse;
+        }
+        public static class PhoneNumber
+        {
+            // Regular expression used to validate a phone number.
+            public const string motif = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
+
+            public static bool IsPhoneNbr(string number)
+            {
+                if (number != null) return Regex.IsMatch(number, motif);
+                else return false;
+            }
         }
         public async Task<List<Employee>> GetAllEmployees()
         {
@@ -108,6 +122,17 @@ namespace EmployeeDetails.Common
 
             }
             return lstEmployees;
+        }
+        public static bool isValidEmail(string inputEmail)
+        {
+            string strRegex = @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}" +
+                  @"\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\" +
+                  @".)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+            Regex re = new Regex(strRegex);
+            if (re.IsMatch(inputEmail))
+                return (true);
+            else
+                return (false);
         }
     }
 }

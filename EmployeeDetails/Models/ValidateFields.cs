@@ -10,7 +10,7 @@ namespace EmployeeDetails.Models
         public string Name { get; set; }
         ValueType Numbers { get; }
 
-        public string DateOfBirth { get; set; }
-        DateTime
+        //public string DateOfBirth { get; set; }
+        //DateTime
     }
 }
